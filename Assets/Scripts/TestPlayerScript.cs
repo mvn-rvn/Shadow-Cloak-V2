@@ -34,7 +34,7 @@ public class TestPlayerScript : MonoBehaviour
         }
         //jump
         if(Input.GetButton("Jump")) {
-            RaycastHit2D ground = Physics2D.Raycast(transform.position, Vector2.down, 1.02f, LayerMask.GetMask("Ground"));
+            RaycastHit2D ground = Physics2D.CircleCast(transform.position, 0.4f, Vector2.down, 0.62f, LayerMask.GetMask("Ground"));
             if(ground.collider != null) {
                 jump = true;
                 Debug.Log("JUMP YOU HECKER JUMP");
@@ -44,7 +44,7 @@ public class TestPlayerScript : MonoBehaviour
 
     void FixedUpdate() {
         //gravity
-        RaycastHit2D ground = Physics2D.Raycast(transform.position, Vector2.down, 1.02f, LayerMask.GetMask("Ground"));
+        RaycastHit2D ground = Physics2D.CircleCast(transform.position, 0.4f, Vector2.down, 0.62f, LayerMask.GetMask("Ground"));
         if(ground.collider == null) {
             Debug.Log("On ground");
             velocity -= gravity_mod * Time.deltaTime;
