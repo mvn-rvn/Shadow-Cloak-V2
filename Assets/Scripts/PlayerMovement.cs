@@ -26,7 +26,7 @@ public class PlayerMovement : MonoBehaviour
         //Vector2 world_to_mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         //Vector2 direction = (world_to_mouse - (Vector2)transform.position).normalized;
         //transform.up = direction;
-
+        
         //movement
         Debug.DrawRay(transform.position, Vector2.down, Color.green);
         movement = new Vector2(Input.GetAxisRaw("Horizontal"), 0);
