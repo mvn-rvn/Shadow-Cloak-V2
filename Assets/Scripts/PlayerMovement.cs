@@ -2,12 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TestPlayerScript : MonoBehaviour
+public class PlayerMovement : MonoBehaviour
 {
     Rigidbody2D rb;
     Vector2 movement;
     bool jump;
     float velocity = 0f;
+    bool double_jump = false;
     //public vars
     public float gravity_mod = 1f;
     public float jump_height = 2f;
@@ -33,12 +34,21 @@ public class TestPlayerScript : MonoBehaviour
             Debug.Log("Moving");
         }
         //jump
-        if(Input.GetButton("Jump")) {
+        if(Input.GetButtonDown("Jump")) {
             RaycastHit2D ground = Physics2D.CircleCast(transform.position, 0.4f, Vector2.down, 0.62f, LayerMask.GetMask("Ground"));
             if(ground.collider != null) {
                 jump = true;
                 Debug.Log("JUMP YOU HECKER JUMP");
+            } else if(double_jump) {
+                jump = true;
+                double_jump = false;
+                Debug.Log("Double jumping breaks the laws of physics.");
             }
+        }
+        //ceiling detection
+        RaycastHit2D ceiling = Physics2D.CircleCast(transform.position, 0.4f, Vector2.up, 0.62f, LayerMask.GetMask("Ground"));
+        if(ceiling.collider != null) {
+            velocity = 0f;
         }
     }
 
@@ -50,14 +60,15 @@ public class TestPlayerScript : MonoBehaviour
             velocity -= gravity_mod * Time.deltaTime;
         } else {
             velocity = 0f;
+            double_jump = true;
         }
         //jumping
         if(jump == true) {
-            velocity = 2f;
+            velocity = jump_height;
             jump = false;
         }
         //movement
         movement.y += velocity;
-        rb.MovePosition((Vector2)transform.position + (movement * Time.deltaTime * 10));
+        rb.MovePosition((Vector2)transform.position + (movement * Time.deltaTime * speed_mod));
     }
 }
