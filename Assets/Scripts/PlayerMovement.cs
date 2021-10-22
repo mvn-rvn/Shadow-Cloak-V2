@@ -27,15 +27,21 @@ public class PlayerMovement : MonoBehaviour
         //Vector2 direction = (world_to_mouse - (Vector2)transform.position).normalized;
         //transform.up = direction;
         
+        //ground detection
+        RaycastHit2D ground = Physics2D.CircleCast(transform.position, 0.4f, Vector2.down, 0.62f, LayerMask.GetMask("Ground"));
+
         //movement
         Debug.DrawRay(transform.position, Vector2.down, Color.green);
-        movement = new Vector2(Input.GetAxisRaw("Horizontal"), 0);
+        if(ground.collider != null) {
+            movement = new Vector2(Input.GetAxisRaw("Horizontal"), 0);
+        } else {
+            movement = new Vector2(Input.GetAxis("Horizontal"), 0);
+        }
         if(movement.x != 0) {
             Debug.Log("Moving");
         }
         //jump
         if(Input.GetButtonDown("Jump")) {
-            RaycastHit2D ground = Physics2D.CircleCast(transform.position, 0.4f, Vector2.down, 0.62f, LayerMask.GetMask("Ground"));
             if(ground.collider != null) {
                 jump = true;
                 Debug.Log("JUMP YOU HECKER JUMP");
