@@ -4,10 +4,15 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+    [HideInInspector]
+    public float velocity = 0f;
+    [HideInInspector]
+    public Vector2 movement;
+    [HideInInspector]
+    public bool dashing = false;
+
     Rigidbody2D rb;
-    Vector2 movement;
     bool jump;
-    float velocity = 0f;
     bool double_jump = false;
     //public vars
     public float gravity_mod = 1f;
@@ -32,9 +37,9 @@ public class PlayerMovement : MonoBehaviour
 
         //movement
         Debug.DrawRay(transform.position, Vector2.down, Color.green);
-        if(ground.collider != null) {
+        if(ground.collider != null && !dashing) {
             movement = new Vector2(Input.GetAxisRaw("Horizontal"), 0);
-        } else {
+        } else if(!dashing) {
             movement = new Vector2(Input.GetAxis("Horizontal"), 0);
         }
         if(movement.x != 0) {
@@ -44,11 +49,11 @@ public class PlayerMovement : MonoBehaviour
         if(Input.GetButtonDown("Jump")) {
             if(ground.collider != null) {
                 jump = true;
-                Debug.Log("JUMP YOU HECKER JUMP");
+                Debug.Log("Jumping");
             } else if(double_jump) {
                 jump = true;
                 double_jump = false;
-                Debug.Log("Double jumping breaks the laws of physics.");
+                Debug.Log("Double jumping (breaks the laws of physics)");
             }
         }
         //ceiling detection
@@ -61,7 +66,7 @@ public class PlayerMovement : MonoBehaviour
     void FixedUpdate() {
         //gravity
         RaycastHit2D ground = Physics2D.CircleCast(transform.position, 0.4f, Vector2.down, 0.62f, LayerMask.GetMask("Ground"));
-        if(ground.collider == null) {
+        if(ground.collider == null && !dashing) {
             Debug.Log("On ground");
             velocity -= gravity_mod * Time.deltaTime;
         } else {
