@@ -6,7 +6,7 @@ public class PlayerMovement : MonoBehaviour
 {
     Rigidbody2D rb;
     SpriteRenderer sprite;
-    Vector2 movement;
+    Vector2 movement = new Vector2(0, 0);
     bool jump;
     float velocity = 0f;
     bool double_jump = false;
@@ -33,11 +33,21 @@ public class PlayerMovement : MonoBehaviour
         RaycastHit2D ground = Physics2D.CircleCast(transform.position, 0.4f, Vector2.down, 0.62f, LayerMask.GetMask("Ground"));
 
         //movement
+        movement.y = 0f;
         Debug.DrawRay(transform.position, Vector2.down, Color.green);
         if(ground.collider != null) {
-            movement = new Vector2(Input.GetAxisRaw("Horizontal"), 0);
+            movement.x = Input.GetAxisRaw("Horizontal");
+
         } else {
-            movement = new Vector2(Input.GetAxis("Horizontal"), 0);
+            movement.x += Input.GetAxisRaw("Horizontal") * Time.deltaTime * 5;
+            movement.x = Mathf.Clamp(movement.x, -1f, 1f);
+            if(Input.GetAxisRaw("Horizontal") == 0) {
+                if(movement.x > 0) {
+                    movement.x -= Time.deltaTime * 3;
+                } else if(movement.x < 0) {
+                    movement.x += Time.deltaTime * 3;
+                }
+            }
         }
         if(movement.x != 0) {
             Debug.Log("Moving");
