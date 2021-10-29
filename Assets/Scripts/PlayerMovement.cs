@@ -4,15 +4,11 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [HideInInspector]
-    public float velocity = 0f;
-    [HideInInspector]
-    public Vector2 movement;
-    [HideInInspector]
-    public bool dashing = false;
-
     Rigidbody2D rb;
+    SpriteRenderer sprite;
+    Vector2 movement;
     bool jump;
+    float velocity = 0f;
     bool double_jump = false;
     //public vars
     public float gravity_mod = 1f;
@@ -22,6 +18,7 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        sprite = GetComponent<SpriteRenderer>();
     }
 
     // Update is called once per frame
@@ -37,9 +34,9 @@ public class PlayerMovement : MonoBehaviour
 
         //movement
         Debug.DrawRay(transform.position, Vector2.down, Color.green);
-        if(ground.collider != null && !dashing) {
+        if(ground.collider != null) {
             movement = new Vector2(Input.GetAxisRaw("Horizontal"), 0);
-        } else if(!dashing) {
+        } else {
             movement = new Vector2(Input.GetAxis("Horizontal"), 0);
         }
         if(movement.x != 0) {
@@ -49,11 +46,11 @@ public class PlayerMovement : MonoBehaviour
         if(Input.GetButtonDown("Jump")) {
             if(ground.collider != null) {
                 jump = true;
-                Debug.Log("Jumping");
+                Debug.Log("JUMP YOU HECKER JUMP");
             } else if(double_jump) {
                 jump = true;
                 double_jump = false;
-                Debug.Log("Double jumping (breaks the laws of physics)");
+                Debug.Log("Double jumping breaks the laws of physics.");
             }
         }
         //ceiling detection
@@ -61,12 +58,18 @@ public class PlayerMovement : MonoBehaviour
         if(ceiling.collider != null) {
             velocity = 0f;
         }
+        //flip sprite depending on move direction
+        if(Input.GetAxisRaw("Horizontal") > 0) {
+            sprite.flipX = true;
+        } else if(Input.GetAxisRaw("Horizontal") < 0) {
+            sprite.flipX = false;
+        }
     }
 
     void FixedUpdate() {
         //gravity
         RaycastHit2D ground = Physics2D.CircleCast(transform.position, 0.4f, Vector2.down, 0.62f, LayerMask.GetMask("Ground"));
-        if(ground.collider == null && !dashing) {
+        if(ground.collider == null) {
             Debug.Log("On ground");
             velocity -= gravity_mod * Time.deltaTime;
         } else {
