@@ -1435,7 +1435,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gravity_mod: 4
-  jump_height: 1.35
+  jump_height: 1.45
   speed_mod: 12
 --- !u!50 &833958337
 Rigidbody2D:
