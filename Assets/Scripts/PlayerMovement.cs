@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -14,11 +15,13 @@ public class PlayerMovement : MonoBehaviour
     public float gravity_mod = 1f;
     public float jump_height = 2f;
     public float speed_mod = 10f;
+    Text txt; //placeholder
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         sprite = GetComponent<SpriteRenderer>();
+        txt = GameObject.Find("Placeholder").GetComponent<Text>();
     }
 
     // Update is called once per frame
@@ -93,6 +96,7 @@ public class PlayerMovement : MonoBehaviour
         }
         //movement
         movement.y += velocity * Time.fixedDeltaTime * 100;
-        rb.MovePosition((Vector2)transform.position + (movement * Time.fixedDeltaTime * speed_mod));
+        txt.text = new Vector3(movement.x * speed_mod, movement.y, 0).ToString(); //debugging movement vector
+        rb.MovePosition((Vector2)transform.position + new Vector2(movement.x * speed_mod, movement.y));
     }
 }
