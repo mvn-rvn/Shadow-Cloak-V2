@@ -80,9 +80,9 @@ public class PlayerMovement : MonoBehaviour
         //gravity
         RaycastHit2D ground = Physics2D.CircleCast(transform.position, 0.4f, Vector2.down, 0.62f, LayerMask.GetMask("Ground"));
         if(ground.collider == null) {
-            Debug.Log("On ground");
-            velocity -= gravity_mod * Time.deltaTime;
+            velocity -= gravity_mod * Time.fixedDeltaTime;
         } else {
+            Debug.Log("On ground");
             velocity = 0f;
             double_jump = true;
         }
@@ -92,7 +92,7 @@ public class PlayerMovement : MonoBehaviour
             jump = false;
         }
         //movement
-        movement.y += velocity * Time.deltaTime * 100;
+        movement.y += velocity * Time.fixedDeltaTime * 100;
         rb.MovePosition((Vector2)transform.position + (movement * Time.fixedDeltaTime * speed_mod));
     }
 }
