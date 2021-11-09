@@ -35,6 +35,13 @@ public class PlayerMovement : MonoBehaviour
         //ground detection
         RaycastHit2D ground = Physics2D.CircleCast(transform.position, 0.4f, Vector2.down, 0.62f, LayerMask.GetMask("Ground"));
 
+        //placeholder sprint
+        if(Input.GetKey(KeyCode.LeftShift)) {
+            speed_mod = 13f * 2;
+        } else {
+            speed_mod = 13f;
+        }
+
         //movement
         movement.y = 0f;
         Debug.DrawRay(transform.position, Vector2.down, Color.green);
@@ -95,8 +102,8 @@ public class PlayerMovement : MonoBehaviour
             jump = false;
         }
         //movement
-        movement.y += velocity * Time.fixedDeltaTime * 100;
-        txt.text = new Vector3(movement.x * speed_mod, movement.y, 0).ToString(); //debugging movement vector
-        rb.MovePosition((Vector2)transform.position + new Vector2(movement.x * speed_mod, movement.y));
+        movement.y += velocity;
+        //txt.text = new Vector3(movement.x * speed_mod, movement.y, 0).ToString(); //debugging movement vector
+        rb.MovePosition((Vector2)rb.position + new Vector2(movement.x * speed_mod * Time.fixedDeltaTime, movement.y));
     }
 }
