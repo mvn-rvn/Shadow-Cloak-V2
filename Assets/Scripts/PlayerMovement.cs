@@ -11,17 +11,21 @@ public class PlayerMovement : MonoBehaviour
     bool jump;
     float velocity = 0f;
     bool double_jump = false;
+    float original_speed_mod;
+    float original_gravity_mod;
     //public vars
     public float gravity_mod = 1f;
     public float jump_height = 2f;
     public float speed_mod = 10f;
-    Text txt; //placeholder
+    public float dash_multiplier = 2f;
+    public float fastfall_multiplier = 1.5f;
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         sprite = GetComponent<SpriteRenderer>();
-        txt = GameObject.Find("Placeholder").GetComponent<Text>();
+        original_speed_mod = speed_mod;
+        original_gravity_mod = gravity_mod;
     }
 
     // Update is called once per frame
@@ -37,41 +41,42 @@ public class PlayerMovement : MonoBehaviour
 
         //placeholder sprint
         if(Input.GetKey(KeyCode.LeftShift)) {
-            speed_mod = 13f * 2;
+            speed_mod = original_speed_mod * dash_multiplier;
         } else {
-            speed_mod = 13f;
+            speed_mod = original_speed_mod;
         }
 
         //movement
         movement.y = 0f;
         Debug.DrawRay(transform.position, Vector2.down, Color.green);
         if(ground.collider != null) {
-            movement.x = Input.GetAxisRaw("Horizontal");
+            movement.x = Input.GetAxisRaw("Horizontal") * speed_mod;
 
         } else {
-            movement.x += Input.GetAxisRaw("Horizontal") * Time.deltaTime * 5;
-            movement.x = Mathf.Clamp(movement.x, -1f, 1f);
+            movement.x += Input.GetAxisRaw("Horizontal") * Time.deltaTime * 5 * speed_mod;
+            movement.x = Mathf.Clamp(movement.x, -speed_mod, speed_mod);
             if(Input.GetAxisRaw("Horizontal") == 0) {
                 if(movement.x > 0) {
-                    movement.x -= Time.deltaTime * 3;
+                    movement.x -= Time.deltaTime * 3 * speed_mod;
                 } else if(movement.x < 0) {
-                    movement.x += Time.deltaTime * 3;
+                    movement.x += Time.deltaTime * 3 * speed_mod;
                 }
             }
-        }
-        if(movement.x != 0) {
-            Debug.Log("Moving");
         }
         //jump
         if(Input.GetButtonDown("Jump")) {
             if(ground.collider != null) {
                 jump = true;
-                Debug.Log("JUMP YOU HECKER JUMP");
             } else if(double_jump) {
                 jump = true;
                 double_jump = false;
-                Debug.Log("Double jumping breaks the laws of physics.");
             }
+        }
+        //fastfall
+        if(Input.GetButton("Fastfall")) {
+            gravity_mod = original_gravity_mod * fastfall_multiplier;
+        } else {
+            gravity_mod = original_gravity_mod;
         }
         //ceiling detection
         RaycastHit2D ceiling = Physics2D.CircleCast(transform.position, 0.4f, Vector2.up, 0.62f, LayerMask.GetMask("Ground"));
@@ -96,6 +101,8 @@ public class PlayerMovement : MonoBehaviour
             velocity = 0f;
             double_jump = true;
         }
+        velocity = Mathf.Clamp(velocity, -original_gravity_mod, Mathf.Infinity);
+        Debug.Log(velocity.ToString());
         //jumping
         if(jump == true) {
             velocity = jump_height;
@@ -103,7 +110,6 @@ public class PlayerMovement : MonoBehaviour
         }
         //movement
         movement.y += velocity;
-        //txt.text = new Vector3(movement.x * speed_mod, movement.y, 0).ToString(); //debugging movement vector
-        rb.MovePosition((Vector2)rb.position + new Vector2(movement.x * speed_mod * Time.fixedDeltaTime, movement.y));
+        rb.MovePosition((Vector2)rb.position + new Vector2(movement.x * Time.fixedDeltaTime, movement.y));
     }
 }

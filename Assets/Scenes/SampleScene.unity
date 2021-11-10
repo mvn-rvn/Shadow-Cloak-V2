@@ -1436,7 +1436,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gravity_mod: 1
   jump_height: 0.4
-  speed_mod: 26
+  speed_mod: 15
+  dash_multiplier: 2
+  fastfall_multiplier: 2.4
 --- !u!50 &833958337
 Rigidbody2D:
   serializedVersion: 4
