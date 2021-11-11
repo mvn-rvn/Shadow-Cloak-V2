@@ -38,6 +38,9 @@ public class PlayerMovement : MonoBehaviour
         
         //ground detection
         RaycastHit2D ground = Physics2D.CircleCast(transform.position, 0.4f, Vector2.down, 0.62f, LayerMask.GetMask("Ground"));
+        //wall detection
+        RaycastHit2D left_wall = Physics2D.BoxCast(transform.position, new Vector2(0.5f, 0.5f), 0f, Vector2.left, 0.27f, LayerMask.GetMask("Ground"));
+        RaycastHit2D right_wall = Physics2D.BoxCast(transform.position, new Vector2(0.5f, 0.5f), 0f, Vector2.right, 0.27f, LayerMask.GetMask("Ground"));
 
         //placeholder sprint
         if(Input.GetKey(KeyCode.LeftShift)) {
@@ -51,8 +54,8 @@ public class PlayerMovement : MonoBehaviour
         Debug.DrawRay(transform.position, Vector2.down, Color.green);
         if(ground.collider != null) {
             movement.x = Input.GetAxisRaw("Horizontal") * speed_mod;
-
         } else {
+            //air drift
             movement.x += Input.GetAxisRaw("Horizontal") * Time.deltaTime * 5 * speed_mod;
             movement.x = Mathf.Clamp(movement.x, -speed_mod, speed_mod);
             if(Input.GetAxisRaw("Horizontal") == 0) {
@@ -63,6 +66,16 @@ public class PlayerMovement : MonoBehaviour
                 }
             }
         }
+
+        //reset movement.x to zero when against wall
+        if(left_wall.collider != null && movement.x < 0) {
+            Debug.Log("Next to left wall");
+            movement.x = 0f;
+        } else if(right_wall.collider != null && movement.x > 0) {
+            Debug.Log("Next to right wall");
+            movement.x = 0f;
+        }
+
         //jump
         if(Input.GetButtonDown("Jump")) {
             if(ground.collider != null) {
@@ -72,17 +85,20 @@ public class PlayerMovement : MonoBehaviour
                 double_jump = false;
             }
         }
+
         //fastfall
         if(Input.GetButton("Fastfall")) {
             gravity_mod = original_gravity_mod * fastfall_multiplier;
         } else {
             gravity_mod = original_gravity_mod;
         }
+
         //ceiling detection
         RaycastHit2D ceiling = Physics2D.CircleCast(transform.position, 0.4f, Vector2.up, 0.62f, LayerMask.GetMask("Ground"));
         if(ceiling.collider != null) {
             velocity = 0f;
         }
+
         //flip sprite depending on move direction
         if(Input.GetAxisRaw("Horizontal") > 0) {
             sprite.flipX = true;
@@ -97,12 +113,10 @@ public class PlayerMovement : MonoBehaviour
         if(ground.collider == null) {
             velocity -= gravity_mod * Time.fixedDeltaTime;
         } else {
-            Debug.Log("On ground");
             velocity = 0f;
             double_jump = true;
         }
         velocity = Mathf.Clamp(velocity, -original_gravity_mod, Mathf.Infinity);
-        Debug.Log(velocity.ToString());
         //jumping
         if(jump == true) {
             velocity = jump_height;
