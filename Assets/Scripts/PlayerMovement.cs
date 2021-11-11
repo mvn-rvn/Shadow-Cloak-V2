@@ -13,6 +13,9 @@ public class PlayerMovement : MonoBehaviour
     bool double_jump = false;
     float original_speed_mod;
     float original_gravity_mod;
+    float original_fall_speed_limit;
+    float wall_grip_time = 0f;
+    bool wall_jump = false;
     
     //public vars
     public float gravity_mod = 1f;
@@ -21,6 +24,8 @@ public class PlayerMovement : MonoBehaviour
     public float dash_multiplier = 2f;
     public float fastfall_multiplier = 1.5f;
     public float fall_speed_limit = 1f;
+    public float wall_grip = 0.25f;
+    public float wall_grip_limit = 1.5f;
 
     // Start is called before the first frame update
     void Start()
@@ -29,6 +34,7 @@ public class PlayerMovement : MonoBehaviour
         sprite = GetComponent<SpriteRenderer>();
         original_speed_mod = speed_mod;
         original_gravity_mod = gravity_mod;
+        original_fall_speed_limit = fall_speed_limit;
     }
 
     // Update is called once per frame
@@ -67,6 +73,28 @@ public class PlayerMovement : MonoBehaviour
             0.27f,
             LayerMask.GetMask("Ground")
         );
+
+        //gripping to wall
+        if((left_wall.collider != null || right_wall.collider != null)
+            && wall_grip_time < wall_grip_limit
+            && Input.GetAxisRaw("Horizontal") != 0)
+        {
+            fall_speed_limit = wall_grip;
+            wall_jump = true;
+
+            if(velocity < 0) {
+                wall_grip_time += Time.deltaTime;
+            }
+
+        } else {
+            fall_speed_limit = original_fall_speed_limit;
+            wall_jump = false;
+        }
+
+        //replenish grip time when on ground
+        if(ground.collider != null) {
+            wall_grip_time = 0f;
+        }
 
         //placeholder sprint
         if(Input.GetKey(KeyCode.LeftShift)) {
@@ -110,11 +138,23 @@ public class PlayerMovement : MonoBehaviour
             movement.x = 0f;
         }
 
-        //jump
+        //jump/double-jump/wall-jump
         if(Input.GetButtonDown("Jump")) {
             if(ground.collider != null) {
                 velocity = jump_height;
+            
+            } else if(wall_jump) {
+                wall_grip_time = 0f;
+                velocity = jump_height;
+                wall_jump = false;
 
+                if(Input.GetAxisRaw("Horizontal") == -1) {
+                    movement.x = original_speed_mod;
+
+                } else {
+                    movement.x = -original_speed_mod;
+                }
+            
             } else if(double_jump) {
                 velocity = jump_height;
                 double_jump = false;
@@ -124,6 +164,7 @@ public class PlayerMovement : MonoBehaviour
         //fastfall
         if(Input.GetButton("Fastfall")) {
             gravity_mod = original_gravity_mod * fastfall_multiplier;
+
         } else {
             gravity_mod = original_gravity_mod;
         }

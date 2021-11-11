@@ -1698,7 +1698,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 8.715149
+  orthographic size: 10
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1866,6 +1866,8 @@ MonoBehaviour:
   dash_multiplier: 2
   fastfall_multiplier: 2.5
   fall_speed_limit: 0.75
+  wall_grip: 0.03
+  wall_grip_limit: 1
 --- !u!50 &833958337
 Rigidbody2D:
   serializedVersion: 4
