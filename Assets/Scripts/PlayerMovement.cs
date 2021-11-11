@@ -8,7 +8,6 @@ public class PlayerMovement : MonoBehaviour
     Rigidbody2D rb;
     SpriteRenderer sprite;
     Vector2 movement = new Vector2(0, 0);
-    bool jump;
     float velocity = 0f;
     bool double_jump = false;
     float original_speed_mod;
@@ -19,6 +18,7 @@ public class PlayerMovement : MonoBehaviour
     public float speed_mod = 10f;
     public float dash_multiplier = 2f;
     public float fastfall_multiplier = 1.5f;
+    public float fall_speed_limit = 1f;
     // Start is called before the first frame update
     void Start()
     {
@@ -39,8 +39,8 @@ public class PlayerMovement : MonoBehaviour
         //ground detection
         RaycastHit2D ground = Physics2D.CircleCast(transform.position, 0.4f, Vector2.down, 0.62f, LayerMask.GetMask("Ground"));
         //wall detection
-        RaycastHit2D left_wall = Physics2D.BoxCast(transform.position, new Vector2(0.5f, 0.5f), 0f, Vector2.left, 0.27f, LayerMask.GetMask("Ground"));
-        RaycastHit2D right_wall = Physics2D.BoxCast(transform.position, new Vector2(0.5f, 0.5f), 0f, Vector2.right, 0.27f, LayerMask.GetMask("Ground"));
+        RaycastHit2D left_wall = Physics2D.BoxCast(transform.position, new Vector2(0.5f, 1.9f), 0f, Vector2.left, 0.27f, LayerMask.GetMask("Ground"));
+        RaycastHit2D right_wall = Physics2D.BoxCast(transform.position, new Vector2(0.5f, 1.9f), 0f, Vector2.right, 0.27f, LayerMask.GetMask("Ground"));
 
         //placeholder sprint
         if(Input.GetKey(KeyCode.LeftShift)) {
@@ -79,9 +79,9 @@ public class PlayerMovement : MonoBehaviour
         //jump
         if(Input.GetButtonDown("Jump")) {
             if(ground.collider != null) {
-                jump = true;
+                velocity = jump_height;
             } else if(double_jump) {
-                jump = true;
+                velocity = jump_height;
                 double_jump = false;
             }
         }
@@ -113,15 +113,10 @@ public class PlayerMovement : MonoBehaviour
         if(ground.collider == null) {
             velocity -= gravity_mod * Time.fixedDeltaTime;
         } else {
-            velocity = 0f;
+            velocity = Mathf.Clamp(velocity, 0, Mathf.Infinity);
             double_jump = true;
         }
-        velocity = Mathf.Clamp(velocity, -original_gravity_mod, Mathf.Infinity);
-        //jumping
-        if(jump == true) {
-            velocity = jump_height;
-            jump = false;
-        }
+        velocity = Mathf.Clamp(velocity, -fall_speed_limit, Mathf.Infinity);
         //movement
         movement.y += velocity;
         rb.MovePosition((Vector2)rb.position + new Vector2(movement.x * Time.fixedDeltaTime, movement.y));
