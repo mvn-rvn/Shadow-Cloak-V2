@@ -31,7 +31,7 @@ public class PlayerMovement : MonoBehaviour
             float dash_direction = 0f;
             float dash_cooldown = 0f;
             bool dash = false;
-        
+            float dash_trail_spawn = 0f;
     
     //public vars
         //movement mods
@@ -44,6 +44,7 @@ public class PlayerMovement : MonoBehaviour
             public float dash_multiplier = 2f;
             public float max_dash_duration = 0.2f;
             public float max_dash_cooldown = 0.3f;
+            public float dash_spawn_rate = 0.05f;
         //fastfall
             [Header("Fastfall")]
             public float fastfall_multiplier = 1.5f;
@@ -196,6 +197,7 @@ public class PlayerMovement : MonoBehaviour
             dash_direction = Input.GetAxisRaw("Horizontal");
             dash_duration = 0f;
             dash = true;
+            sprite_rend.sprite = dash_sprite;
         }
 
         if(dash && dash_duration < max_dash_duration) {
@@ -211,6 +213,7 @@ public class PlayerMovement : MonoBehaviour
                 dash_duration = 0f;
                 velocity = jump_height * 0.9f;
                 movement.x = dash_direction * speed_mod;
+                sprite_rend.sprite = walk_sprite;
             }
 
         } else if(dash && dash_duration >= max_dash_duration && !dash_jump) {
@@ -219,6 +222,7 @@ public class PlayerMovement : MonoBehaviour
             dash = false;
             speed_mod = original_speed_mod;
             movement.x = Mathf.Clamp(movement.x, -original_speed_mod, original_speed_mod);
+            sprite_rend.sprite = walk_sprite;
 
         } else {
             dash_cooldown += Time.deltaTime;
@@ -242,6 +246,27 @@ public class PlayerMovement : MonoBehaviour
             sprite_rend.flipX = true;
         } else if(Input.GetAxisRaw("Horizontal") < 0) {
             sprite_rend.flipX = false;
+        }
+
+        //dash trail
+        if(dash) {
+
+            if(dash_trail_spawn >= dash_spawn_rate) {
+                GameObject dash_trail;
+                dash_trail = new GameObject("Dash Trail");
+                dash_trail.AddComponent<SpriteRenderer>();
+                dash_trail.AddComponent<DashTrailFade>();
+                dash_trail.GetComponent<SpriteRenderer>().sprite = dash_trail_sprite;
+                dash_trail.GetComponent<SpriteRenderer>().flipX = sprite_rend.flipX;
+                dash_trail.transform.position = new Vector3(transform.position.x, transform.position.y, 1);
+                dash_trail_spawn = 0f;
+
+            } else {
+                dash_trail_spawn += Time.deltaTime;
+            }
+
+        } else {
+            dash_trail_spawn = dash_spawn_rate;
         }
     }
 

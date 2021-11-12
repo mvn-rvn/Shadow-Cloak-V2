@@ -2615,6 +2615,9 @@ MonoBehaviour:
   fall_speed_limit: 0.75
   wall_grip: 0.03
   wall_grip_limit: 1
+  dash_sprite: {fileID: -2371404628718752118, guid: 8f9cd84e0e20b014abb18d1826087e16, type: 3}
+  walk_sprite: {fileID: -3022836322531202740, guid: 8f9cd84e0e20b014abb18d1826087e16, type: 3}
+  dash_trail_sprite: {fileID: 8348877483641630340, guid: 8f9cd84e0e20b014abb18d1826087e16, type: 3}
 --- !u!50 &833958337
 Rigidbody2D:
   serializedVersion: 4
