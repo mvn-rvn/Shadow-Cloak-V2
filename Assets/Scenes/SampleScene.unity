@@ -1838,9 +1838,9 @@ GameObject:
   m_Component:
   - component: {fileID: 833958339}
   - component: {fileID: 833958338}
+  - component: {fileID: 833958336}
   - component: {fileID: 833958337}
   - component: {fileID: 833958340}
-  - component: {fileID: 833958336}
   m_Layer: 6
   m_Name: TestPlayer
   m_TagString: Untagged
@@ -1863,7 +1863,9 @@ MonoBehaviour:
   gravity_mod: 1
   jump_height: 0.4
   speed_mod: 15
-  dash_multiplier: 2
+  dash_multiplier: 2.2
+  max_dash_duration: 0.2
+  max_dash_cooldown: 0.3
   fastfall_multiplier: 2.5
   fall_speed_limit: 0.75
   wall_grip: 0.03

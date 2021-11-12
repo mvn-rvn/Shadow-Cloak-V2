@@ -16,12 +16,19 @@ public class PlayerMovement : MonoBehaviour
     float original_fall_speed_limit;
     float wall_grip_time = 0f;
     bool wall_jump = false;
+    float dash_duration = 0f;
+    float dash_direction = 0f;
+    float dash_cooldown = 0f;
+    bool dash = false;
+    bool dash_jump = false;
     
     //public vars
     public float gravity_mod = 1f;
     public float jump_height = 2f;
     public float speed_mod = 10f;
     public float dash_multiplier = 2f;
+    public float max_dash_duration = 0.2f;
+    public float max_dash_cooldown = 0.3f;
     public float fastfall_multiplier = 1.5f;
     public float fall_speed_limit = 1f;
     public float wall_grip = 0.25f;
@@ -77,7 +84,8 @@ public class PlayerMovement : MonoBehaviour
         //gripping to wall
         if((left_wall.collider != null || right_wall.collider != null)
             && wall_grip_time < wall_grip_limit
-            && Input.GetAxisRaw("Horizontal") != 0)
+            && Input.GetAxisRaw("Horizontal") != 0
+            && !dash)
         {
             fall_speed_limit = wall_grip;
             wall_jump = true;
@@ -96,20 +104,12 @@ public class PlayerMovement : MonoBehaviour
             wall_grip_time = 0f;
         }
 
-        //placeholder sprint
-        if(Input.GetKey(KeyCode.LeftShift)) {
-            speed_mod = original_speed_mod * dash_multiplier;
-
-        } else {
-            speed_mod = original_speed_mod;
-        }
-
         //movement
         movement.y = 0f;
         if(ground.collider != null) {
             movement.x = Input.GetAxisRaw("Horizontal") * speed_mod;
+            
         } else {
-
             //air drift
             if((movement.x <= original_speed_mod && Input.GetAxisRaw("Horizontal") == 1) 
                 || (movement.x >= -original_speed_mod && Input.GetAxisRaw("Horizontal") == -1))
@@ -169,6 +169,40 @@ public class PlayerMovement : MonoBehaviour
             gravity_mod = original_gravity_mod;
         }
 
+        //dash
+        if(Input.GetButtonDown("Dash") && Input.GetAxisRaw("Horizontal") != 0 && dash_cooldown == max_dash_cooldown) {
+            dash_direction = Input.GetAxisRaw("Horizontal");
+            dash_duration = 0f;
+            dash = true;
+        }
+
+        if(dash && dash_duration < max_dash_duration) {
+            speed_mod = original_speed_mod * dash_multiplier;
+            dash_duration += Time.deltaTime;
+            movement.x = dash_direction * speed_mod;
+            dash_cooldown = 0f;
+
+            //dash-jump
+            if(Input.GetButtonDown("Jump") && ground.collider != null) {
+                dash = false;
+                dash_jump = true;
+                dash_duration = 0f;
+                velocity = jump_height * 0.9f;
+                movement.x = dash_direction * speed_mod;
+            }
+
+        } else if(dash && dash_duration >= max_dash_duration && !dash_jump) {
+            //essentially post-dash cleanup. Skipped if dash-jumping
+            dash_duration = 0f;
+            dash = false;
+            speed_mod = original_speed_mod;
+            movement.x = Mathf.Clamp(movement.x, -original_speed_mod, original_speed_mod);
+
+        } else {
+            dash_cooldown += Time.deltaTime;
+            dash_cooldown = Mathf.Clamp(dash_cooldown, 0f, max_dash_cooldown);
+        }
+
         //ceiling detection
         RaycastHit2D ceiling = Physics2D.CircleCast(
             transform.position, 
@@ -199,8 +233,11 @@ public class PlayerMovement : MonoBehaviour
             LayerMask.GetMask("Ground")
         );
 
-        if(ground.collider == null) {
+        if(ground.collider == null && !dash) {
             velocity -= gravity_mod * Time.fixedDeltaTime;
+
+        } else if(dash) {
+            velocity = 0f;
 
         } else {
             velocity = Mathf.Clamp(velocity, 0, Mathf.Infinity);
@@ -212,5 +249,10 @@ public class PlayerMovement : MonoBehaviour
         //movement
         movement.y += velocity;
         rb.MovePosition((Vector2)rb.position + new Vector2(movement.x * Time.fixedDeltaTime, movement.y));
+        //essentially forces the program to wait until dash-jump is completed before resetting movement speed
+        if(dash_jump) {
+            dash_jump = false;
+            speed_mod = original_speed_mod;
+        }
     }
 }
