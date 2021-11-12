@@ -9,39 +9,60 @@ using UnityEngine.UI;
 public class PlayerMovement : MonoBehaviour
 {
     //normal/private vars
-    Rigidbody2D rb;
-    SpriteRenderer sprite;
-    Vector2 movement = new Vector2(0, 0);
-    float velocity = 0f;
-    bool double_jump = false;
-    float original_speed_mod;
-    float original_gravity_mod;
-    float original_fall_speed_limit;
-    float wall_grip_time = 0f;
-    bool wall_jump = false;
-    float dash_duration = 0f;
-    float dash_direction = 0f;
-    float dash_cooldown = 0f;
-    bool dash = false;
-    bool dash_jump = false;
+        //rigidbody
+            Rigidbody2D rb;
+        //sprite renderer
+            SpriteRenderer sprite_rend;
+        //movement vector
+            Vector2 movement = new Vector2(0, 0);
+        //gravity velocity
+            float velocity = 0f;
+        //jump stuffs
+            bool dash_jump = false;
+            bool wall_jump = false;
+            bool double_jump = false;
+        //original mods
+            float original_speed_mod;
+            float original_gravity_mod;
+            float original_fall_speed_limit;
+            float wall_grip_time = 0f;
+        //dash
+            float dash_duration = 0f;
+            float dash_direction = 0f;
+            float dash_cooldown = 0f;
+            bool dash = false;
+        
     
     //public vars
-    public float gravity_mod = 1f;
-    public float jump_height = 2f;
-    public float speed_mod = 10f;
-    public float dash_multiplier = 2f;
-    public float max_dash_duration = 0.2f;
-    public float max_dash_cooldown = 0.3f;
-    public float fastfall_multiplier = 1.5f;
-    public float fall_speed_limit = 1f;
-    public float wall_grip = 0.25f;
-    public float wall_grip_limit = 1.5f;
+        //movement mods
+            [Header("Movement Mods")]
+            public float gravity_mod = 1f;
+            public float jump_height = 2f;
+            public float speed_mod = 10f;
+        //dash mods
+            [Header("Dash Mods")]
+            public float dash_multiplier = 2f;
+            public float max_dash_duration = 0.2f;
+            public float max_dash_cooldown = 0.3f;
+        //fastfall
+            [Header("Fastfall")]
+            public float fastfall_multiplier = 1.5f;
+            public float fall_speed_limit = 1f;
+        //wall gripping
+            [Header("Wall Gripping")]
+            public float wall_grip = 0.25f;
+            public float wall_grip_limit = 1.5f;
+        //sprites
+            [Header("Sprites")]
+            public Sprite dash_sprite;
+            public Sprite walk_sprite;
+            public Sprite dash_trail_sprite;
 
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        sprite = GetComponent<SpriteRenderer>();
+        sprite_rend = GetComponent<SpriteRenderer>();
         original_speed_mod = speed_mod;
         original_gravity_mod = gravity_mod;
         original_fall_speed_limit = fall_speed_limit;
@@ -133,11 +154,9 @@ public class PlayerMovement : MonoBehaviour
 
         //reset movement.x to zero when against wall
         if(left_wall.collider != null && movement.x < 0) {
-            Debug.Log("Next to left wall");
             movement.x = 0f;
 
         } else if(right_wall.collider != null && movement.x > 0) {
-            Debug.Log("Next to right wall");
             movement.x = 0f;
         }
 
@@ -158,7 +177,7 @@ public class PlayerMovement : MonoBehaviour
                     movement.x = -original_speed_mod;
                 }
             
-            } else if(double_jump) {
+            } else if(double_jump && !dash) {
                 velocity = jump_height;
                 double_jump = false;
             }
@@ -220,9 +239,9 @@ public class PlayerMovement : MonoBehaviour
 
         //flip sprite depending on move direction
         if(Input.GetAxisRaw("Horizontal") > 0) {
-            sprite.flipX = true;
+            sprite_rend.flipX = true;
         } else if(Input.GetAxisRaw("Horizontal") < 0) {
-            sprite.flipX = false;
+            sprite_rend.flipX = false;
         }
     }
 
