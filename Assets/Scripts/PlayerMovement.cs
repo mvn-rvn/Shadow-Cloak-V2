@@ -223,6 +223,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    // Physics update
     void FixedUpdate() {
         //gravity
         RaycastHit2D ground = Physics2D.CircleCast(
