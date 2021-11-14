@@ -18,7 +18,11 @@ public class DashTrailFade : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        tmp.a -= Time.fixedDeltaTime * 10;
+        tmp.a -= Time.fixedDeltaTime * 7;
         sprite_rend.color = tmp;
+
+        if(sprite_rend.color.a <= 0) {
+            Destroy(gameObject);
+        }
     }
 }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-//TODO: Change sprite when dashing
 //TODO: BUILD THE HECKING LEVEL
 
 public class PlayerMovement : MonoBehaviour
