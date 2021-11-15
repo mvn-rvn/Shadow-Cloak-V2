@@ -142,8 +142,13 @@ public class PlayerMovement : MonoBehaviour
             }
 
             if(Input.GetAxisRaw("Horizontal") == 0) {
+                //if movement is close enough to zero, clamp to zero
+                if(movement.x < Time.deltaTime * 3 * speed_mod
+                    && movement.x > -Time.deltaTime * 3 * speed_mod) 
+                {
+                    movement.x = 0f;
 
-                if(movement.x > 0) {
+                } else if(movement.x > 0) {
                     movement.x -= Time.deltaTime * 3 * speed_mod;
 
                 } else if(movement.x < 0) {
