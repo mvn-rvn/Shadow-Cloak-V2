@@ -113,6 +113,7 @@ public class PlayerMovement : MonoBehaviour
         {
             fall_speed_limit = wall_grip;
             wall_jump = true;
+            double_jump = true;
 
             if(velocity < 0) {
                 wall_grip_time += Time.deltaTime;
